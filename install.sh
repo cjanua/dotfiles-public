@@ -35,6 +35,10 @@ packages=(
     "slurp"
     "swappy"
     "wl-clipboard"
+
+    "fortune"
+    "cowsay"
+    "neofetch"
 )
 
 # Install packages
