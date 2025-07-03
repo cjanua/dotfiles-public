@@ -17,7 +17,7 @@ packages=(
     "ttf-font-awesome" "pipewire" "pipewire-alsa" "pipewire-pulse"
     "wireplumber" "networkmanager" "bluez" "bluez-utils"
     "brightnessctl" "playerctl" "grim" "slurp" "swappy" "wl-clipboard"
-    "fortune" "cowsay" "neofetch" "rsync"
+    "cowsay" "rsync"
 )
 sudo pacman -S --needed "${packages[@]}" || { echo -e "${RED}Failed to install core packages.${NC}"; exit 1; }
 
@@ -37,6 +37,8 @@ aur_packages=(
     "waybar-hyprland-git"
     "sddm-git"
     "wlogout"
+    "fortune"
+    "neofetch"
 )
 yay -S --needed "${aur_packages[@]}" || { echo -e "${RED}Failed to install AUR packages.${NC}"; exit 1; }
 
