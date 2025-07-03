@@ -8,6 +8,38 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}Starting dotfiles setup with backup...${NC}"
 
+
+# --- Package Installation (unchanged) ---
+echo -e "${GREEN}Installing essential packages...${NC}"
+packages=(
+    "base-devel" "git" "neovim" "hyprland" "waybar" "rofi" "dunst"
+    "alacritty" "starship" "fastfetch" "ttf-jetbrains-mono-nerd"
+    "ttf-font-awesome" "pipewire" "pipewire-alsa" "pipewire-pulse"
+    "wireplumber" "networkmanager" "bluez" "bluez-utils"
+    "brightnessctl" "playerctl" "grim" "slurp" "swappy" "wl-clipboard"
+    "fortune" "cowsay" "neofetch" "rsync"
+)
+sudo pacman -S --needed "${packages[@]}" || { echo -e "${RED}Failed to install core packages.${NC}"; exit 1; }
+
+# Install yay if not present
+if ! command -v yay &> /dev/null; then
+    echo -e "${YELLOW}Installing yay...${NC}"
+    cd /tmp || { echo -e "${RED}Failed to change to /tmp directory.${NC}"; exit 1; }
+    git clone https://aur.archlinux.org/yay.git || { echo -e "${RED}Failed to clone yay repository.${NC}"; exit 1; }
+    cd yay || { echo -e "${RED}Failed to change to yay directory.${NC}"; exit 1; }
+    makepkg -si --noconfirm || { echo -e "${RED}Failed to install yay.${NC}"; exit 1; }
+    cd - || { echo -e "${RED}Failed to return to previous directory.${NC}"; exit 1; } # Return to original PWD
+fi
+
+# AUR packages
+echo -e "${GREEN}Installing AUR packages...${NC}"
+aur_packages=(
+    "waybar-hyprland-git"
+    "sddm-git"
+    "wlogout"
+)
+yay -S --needed "${aur_packages[@]}" || { echo -e "${RED}Failed to install AUR packages.${NC}"; exit 1; }
+
 # --- 1. Create Backup of Existing Configuration ---
 echo -e "${YELLOW}Creating backup of existing ~/.config and .bashrc...${NC}"
 
@@ -34,37 +66,6 @@ else
 fi
 
 echo -e "${GREEN}Backup complete.${NC}"
-
-# --- Package Installation (unchanged) ---
-echo -e "${GREEN}Installing essential packages...${NC}"
-packages=(
-    "base-devel" "git" "neovim" "hyprland" "waybar" "rofi" "dunst"
-    "alacritty" "starship" "fastfetch" "ttf-jetbrains-mono-nerd"
-    "ttf-font-awesome" "pipewire" "pipewire-alsa" "pipewire-pulse"
-    "wireplumber" "networkmanager" "bluez" "bluez-utils"
-    "brightnessctl" "playerctl" "grim" "slurp" "swappy" "wl-clipboard"
-    "fortune" "cowsay" "neofetch"
-)
-sudo pacman -S --needed "${packages[@]}" || { echo -e "${RED}Failed to install core packages.${NC}"; exit 1; }
-
-# Install yay if not present
-if ! command -v yay &> /dev/null; then
-    echo -e "${YELLOW}Installing yay...${NC}"
-    cd /tmp || { echo -e "${RED}Failed to change to /tmp directory.${NC}"; exit 1; }
-    git clone https://aur.archlinux.org/yay.git || { echo -e "${RED}Failed to clone yay repository.${NC}"; exit 1; }
-    cd yay || { echo -e "${RED}Failed to change to yay directory.${NC}"; exit 1; }
-    makepkg -si --noconfirm || { echo -e "${RED}Failed to install yay.${NC}"; exit 1; }
-    cd - || { echo -e "${RED}Failed to return to previous directory.${NC}"; exit 1; } # Return to original PWD
-fi
-
-# AUR packages
-echo -e "${GREEN}Installing AUR packages...${NC}"
-aur_packages=(
-    "waybar-hyprland-git"
-    "sddm-git"
-    "wlogout"
-)
-yay -S --needed "${aur_packages[@]}" || { echo -e "${RED}Failed to install AUR packages.${NC}"; exit 1; }
 
 # --- Core Symlinking Logic (from previous version) ---
 echo -e "${GREEN}Creating symlinks for dotfiles...${NC}"
