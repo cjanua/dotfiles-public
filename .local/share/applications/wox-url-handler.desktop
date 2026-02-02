@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Wox
+Exec=/opt/wox/wox %u
+MimeType=x-scheme-handler/wox;
+Terminal=false
+NoDisplay=true

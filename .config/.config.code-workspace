@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../user_scripts"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}

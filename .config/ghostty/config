@@ -1,0 +1,31 @@
+font-family = "DejaVu Sans Mono"
+
+font-feature = -calt
+
+font-feature = -liga  # Disable standard ligatures
+
+font-feature = -dlig  # Disable discretionary ligatures
+
+
+
+# adjust-cell-width = "-40%"
+
+adjust-cell-height = 1
+
+cursor-style = block_hollow
+
+shell-integration = detect
+
+font-thicken = false
+
+theme = Dark+
+
+window-theme = system
+
+background-opacity = 0.85
+
+background = #11111b
+
+gtk-tabs-location = hidden
+
+window-decoration = false

@@ -1,0 +1,61 @@
+{
+    "redhat.telemetry.enabled": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "git.autofetch": true,
+    "notebook.output.scrolling": true,
+    "notebook.output.textLineLimit": 45,
+    "explorer.fileNesting.patterns": {
+        "*.ts": "${capture}.js",
+        "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+        "*.jsx": "${capture}.js",
+        "*.tsx": "${capture}.ts",
+        "tsconfig.json": "tsconfig.*.json",
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb",
+        "Cargo.toml": "Cargo.lock",
+        "*.sqlite": "${capture}.${extname}-*",
+        "*.db": "${capture}.${extname}-*",
+        "*.sqlite3": "${capture}.${extname}-*",
+        "*.db3": "${capture}.${extname}-*",
+        "*.sdb": "${capture}.${extname}-*",
+        "*.s3db": "${capture}.${extname}-*"
+    },
+    "database-client.autoSync": true,
+    "files.exclude": {
+        "**/.git": false
+    },
+    "vs-kubernetes": {
+        "vscode-kubernetes.kubectl-path-linux": "/home/cjanua/.local/state/vs-kubernetes/tools/kubectl/kubectl",
+        "vscode-kubernetes.minikube-path-linux": "/home/cjanua/.local/state/vs-kubernetes/tools/minikube/linux-amd64/minikube",
+        "vscode-kubernetes.helm-path-linux": "/home/cjanua/.local/state/vs-kubernetes/tools/helm/linux-amd64/helm"
+    },
+    "animations.Install-Method": "Apc Customize UI++",
+    "workbench.colorTheme": "Monokai Vibrant (Rust)",
+    "apc.imports": [
+        "file://${userHome}/.vscode/extensions/brandonkirbyson.vscode-animations-2.0.7/dist/updateHandler.js"
+    ],
+    "git.suggestSmartCommit": false,
+    "diffEditor.codeLens": true,
+    "geminicodeassist.customCommands": {
+        "update-fix": "Apply the following updates/fix to my code. CHANGE AS FEW LINES AS POSSIBLE (ACCOMPLISH THE TASK AN MINIMIZE THE `git diff`)"
+    },
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "sqltools.useNodeRuntime": true,
+    "jupyter.askForKernelRestart": false,
+    "cSpell.userWords": [
+        "Amdahl's",
+        "Bashforth",
+        "Januario",
+        "justfile",
+        "parallelizable"
+    ],
+    "terminal.integrated.gpuAcceleration": "off",
+    "terminal.integrated.fastScrollSensitivity": 5,
+    "terminal.integrated.smoothScrolling": false,
+    "terminal.integrated.shellIntegration.enabled": true,
+    "terminal.integrated.shellIntegration.decorationsEnabled": "never",
+    "window.restoreWindows": "none"
+}
