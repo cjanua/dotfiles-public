@@ -1,129 +1,142 @@
 # =============================================================================
-# GLOBAL VARIABLES
+# [GLOBAL CONFIGURATION]
 # =============================================================================
-# Define the bare git command once
+# The core git command for the bare repo
 git_cmd := "/usr/bin/git --git-dir=" + env_var('HOME') + "/dusky/ --work-tree=" + env_var('HOME')
+# Your specific repo (Origin)
+my_repo := "git@github.com:cjanua/dotfiles-public.git"
+# Official Dusky repo (Upstream)
+dusky_repo := "https://github.com/duskylinux/dotfiles.git"
+
+set shell := ["bash", "-c"]
 
 # Default: List all available recipes
 default:
-    @just --list
+    @just --list --unsorted
 
-# GIT PASSTHROUGH
+# =============================================================================
+# [CORE WORKFLOW] - Daily Drivers
+# =============================================================================
+
+# Save configuration to Your GitHub (Auto-backs up packages)
+# Usage: sys save "Added new hyprland keybinds"
+save +message="Auto-save snapshot":
+    @echo "📦 Generating package lists..."
+    @just --justfile {{justfile()}} backup-packages
+    
+    @echo "📥 Staging tracked files..."
+    {{git_cmd}} add -u
+    
+    @echo "💾 Committing..."
+    {{git_cmd}} commit -m "{{message}}" || echo "Nothing to commit."
+    
+    @echo "☁️  Pushing to Origin..."
+    {{git_cmd}} push origin main
+    @echo "✅ State saved successfully."
+
+# Pull changes from Your GitHub (Syncing between multiple machines)
+sync:
+    @echo "⬇️  Fetching from Origin..."
+    {{git_cmd}} pull origin main
+    @echo "✅ System synced with cloud."
+
+# Update from official Dusky repo safely
+upgrade:
+    @echo "🔗 Ensuring upstream remote exists..."
+    @{{git_cmd}} remote add upstream {{dusky_repo}} 2>/dev/null || true
+    
+    @echo "📡 Fetching updates from Dusky..."
+    {{git_cmd}} fetch upstream
+    
+    @echo "🛡️  Creating a safety snapshot branch (pre-upgrade)..."
+    {{git_cmd}} branch -f pre-upgrade-backup
+    
+    @echo "🔀 Merging Dusky updates into Main..."
+    @echo "⚠️  NOTE: If conflicts occur, resolve them, then run 'sys save \"Resolved conflicts\"'"
+    {{git_cmd}} merge upstream/main
+
+# Abort an upgrade if it breaks things (Hard Reset)
+abort-upgrade:
+    {{git_cmd}} merge --abort 2>/dev/null || true
+    {{git_cmd}} reset --hard HEAD
+    @echo "⏪ Upgrade aborted. Back to previous state."
+
+# =============================================================================
+# [FILE MANAGEMENT]
+# =============================================================================
+
+# Track a new file or folder
+add path:
+    {{git_cmd}} add {{path}}
+    @# Update the readable tracking list
+    @target=$(realpath --relative-to=$HOME "{{path}}"); \
+    echo "Tracking: $target"; \
+    echo "$target" >> $HOME/.git_dusky_list; \
+    sort -u $HOME/.git_dusky_list -o $HOME/.git_dusky_list
+
+# Stop tracking a file (Keeps file on disk)
+forget path:
+    {{git_cmd}} rm --cached -r {{path}}
+    @# Remove from tracking list
+    @target=$(realpath --relative-to=$HOME "{{path}}"); \
+    sed -i "\|${target}|d" $HOME/.git_dusky_list
+    @echo "🚫 No longer tracking: {{path}}"
+
+# Restore a file to its last saved state (Undo changes)
+restore path:
+    {{git_cmd}} restore {{path}}
+
+# Passthrough for raw git commands
 git +args='':
     {{git_cmd}} {{args}}
 
-
-# =============================================================================
-# [DOTFILES]
-# Usage: just dotfiles <command> [args]
-# =============================================================================
-
-# The Dispatcher
-dotfiles action +args='':
-    @just --justfile {{justfile()}} dotfiles-{{action}} {{args}}
-
-# --- Sub-commands (prefixed with dotfiles-) ---
-
-# Internal: Add files to git and the tracking list
-[private]
-dotfiles-add +files:
-    @# 1. Git Add
-    {{git_cmd}} add {{files}}
-    
-    @# 2. Update Tracking List
-    @for file in {{files}}; do \
-        target=$(realpath --relative-to=$HOME "$file"); \
-        echo "Tracking: $target"; \
-        echo "$target" >> $HOME/.git_dusky_list; \
-    done
-    
-    @# 3. Sort and Clean List
-    @sort -u $HOME/.git_dusky_list -o $HOME/.git_dusky_list
-    @echo "[OK] Dotfiles tracked."
-
-# Internal: Commit and Push
-[private]
-dotfiles-save +message:
-    @just --justfile {{justfile()}} backup-packages
-    {{git_cmd}} commit -m "{{message}}"
-    {{git_cmd}} push
-    @echo "[SUCCESS] Configuration saved and pushed."
-
-[private]
-dotfiles-restore +args:
-    {{git_cmd}} restore {{args}}
-
-# Internal: Pull updates safely
-[private]
-dotfiles-upgrade:
-    @echo ">> Fetching upstream..."
-    {{git_cmd}} fetch origin main
-    @echo ">> Merging updates..."
-    {{git_cmd}} merge origin/main
-    @echo "[OK] Upgrade complete."
-
-# Internal: Git Status
-[private]
-dotfiles-status:
+# Show current status
+status:
     {{git_cmd}} status -s
 
 # =============================================================================
-# [SYSTEM]
-# Usage: just system <command>
+# [SYSTEM & MAINTENANCE]
 # =============================================================================
 
-system action +args='':
-    @just --justfile {{justfile()}} system-{{action}} {{args}}
-
-[private]
+# Full System Update (Paru + Arch)
 system-update:
     paru -Syu
-    @echo "[OK] System updated."
+    @echo "✅ System updated."
 
-[private]
-system-clean:
+# Clean cache and garbage collect Git DB
+clean:
     ~/user_scripts/arch_setup_scripts/scripts/065_cache_purge.sh
+    {{git_cmd}} gc --prune=now
+    @echo "🧹 Cleanup complete."
 
-# ================================
-# Backup root configs
-# ================================
+# Install/Bootstrap (Run this after a fresh git clone)
+install:
+    @echo "🚀 Starting Post-Clone Bootstrap..."
+    @just --justfile {{justfile()}} system-update
+    @# Ensure scripts are executable
+    @chmod +x ~/user_scripts/**/*.sh
+    @echo "✅ Permissions fixed."
+    @echo "ℹ️  Run 'sys restore .' to force all config files to match the repo."
 
-backup target:
-    @just --justfile {{justfile()}} backup-{{target}}
+# =============================================================================
+# [BACKUPS] - Internal Helpers
+# =============================================================================
 
 [private]
 backup-sddm:
     @echo ">> Backing up SDDM configs to ~/system_backups..."
     @mkdir -p $HOME/system_backups/etc
     @mkdir -p $HOME/system_backups/themes
-    
-    # Copy main config
-    @sudo cp /etc/sddm.conf $HOME/system_backups/etc/sddm.conf
-    
-    # Copy your current theme (Change 'dusky' to your actual theme folder name if different)
-    @if [ -d "/usr/share/sddm/themes/dusky" ]; then \
-        sudo cp -r /usr/share/sddm/themes/dusky $HOME/system_backups/themes/; \
-    fi
-    
-    @# Fix permissions so you own the backup files
+    @if [ -f "/etc/sddm.conf" ]; then sudo cp /etc/sddm.conf $HOME/system_backups/etc/sddm.conf; fi
+    @if [ -d "/usr/share/sddm/themes/dusky" ]; then sudo cp -r /usr/share/sddm/themes/dusky $HOME/system_backups/themes/; fi
     @sudo chown -R $USER:$USER $HOME/system_backups
-    
-    @# Add to git
-    @just --justfile {{justfile()}} dotfiles-add $HOME/system_backups
-    @echo "[OK] SDDM backed up and tracked."
+    @just --justfile {{justfile()}} add $HOME/system_backups
+    @echo "✅ SDDM backed up."
 
 [private]
 backup-packages:
     @echo ">> Generating package lists..."
-    @# Save explicit native packages (things you installed on purpose)
-    @pacman -Qqe > $HOME/pkglist_native.txt
-    
-    @# Save AUR packages (explicit only)
+    @pacman -Qqen > $HOME/pkglist_native.txt
     @pacman -Qqem > $HOME/pkglist_aur.txt
-    
-    @# Track them
-    @just --justfile {{justfile()}} dotfiles-add $HOME/pkglist_native.txt
-    @just --justfile {{justfile()}} dotfiles-add $HOME/pkglist_aur.txt
-    @echo "[OK] Package lists updated."
-
-    
+    @just --justfile {{justfile()}} add $HOME/pkglist_native.txt
+    @just --justfile {{justfile()}} add $HOME/pkglist_aur.txt
