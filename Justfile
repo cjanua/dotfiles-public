@@ -12,7 +12,7 @@ set shell := ["bash", "-c"]
 
 # Default: List all available recipes
 default:
-    @just --list --unsorted
+    @just --choose
 
 # =============================================================================
 # [CORE WORKFLOW] - Daily Drivers
@@ -117,6 +117,18 @@ install:
     @chmod +x ~/user_scripts/**/*.sh
     @echo "✅ Permissions fixed."
     @echo "ℹ️  Run 'sys restore .' to force all config files to match the repo."
+    @just --justfile {{justfile()}} _install_packages
+    @echo "🎉 Bootstrap complete."
+
+# Install Packages from backup lists (Run after Fresh Install)
+_install_packages:
+    @echo "📦 Installing Native Packages..."
+    @if [ -f $HOME/pkglist_native.txt ]; then sudo pacman -S --needed - < $HOME/pkglist_native.txt; else echo "No native list found."; fi
+    
+    @echo "📦 Installing AUR Packages..."
+    @if [ -f $HOME/pkglist_aur.txt ]; then paru -S --needed - < $HOME/pkglist_aur.txt; else echo "No AUR list found."; fi
+    
+    @echo "✅ All software restored."
 
 # =============================================================================
 # [BACKUPS] - Internal Helpers

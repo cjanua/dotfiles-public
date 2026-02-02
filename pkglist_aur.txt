@@ -6,7 +6,6 @@ brave-bin
 cbonsai
 chessx
 cursor-bin
-disable-c6-systemd-with-modern-standby
 dislocker
 edex-ui-bin
 eww
@@ -47,7 +46,6 @@ wifitui-bin
 wlogout
 xdg-terminal-exec
 yay
-yay-git-debug
 youtube-dl-gui-bin
 ytdownloader
 zen-browser-bin
