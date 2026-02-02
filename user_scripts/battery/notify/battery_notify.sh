@@ -131,7 +131,9 @@ fn_notify() {
     fi
 
     if [[ "$HAS_NOTIFY_SEND" == "true" ]]; then
+        # Use --hint to bypass swaync's Do Not Disturb mode for battery notifications
         notify-send -u "$urgency" -t 5000 -a "Battery Monitor" -i "$icon" \
+            --hint=string:x-dunst-stack-tag:battery \
             "$title" "$body" 2>/dev/null || log "Warning: notify-send failed"
     else
         log "Notification: [$urgency] $title - $body"

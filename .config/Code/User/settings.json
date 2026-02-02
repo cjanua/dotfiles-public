@@ -50,7 +50,8 @@
         "Bashforth",
         "Januario",
         "justfile",
-        "parallelizable"
+        "parallelizable",
+        "paru"
     ],
     "terminal.integrated.gpuAcceleration": "off",
     "terminal.integrated.fastScrollSensitivity": 5,
