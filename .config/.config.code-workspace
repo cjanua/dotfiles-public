@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../user_scripts"
+		},
+		{
+			"path": "../Justfile"
 		}
 	],
 	"settings": {
