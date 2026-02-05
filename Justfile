@@ -23,11 +23,9 @@ default:
 save +message="Auto-save snapshot":
     @echo "📦 Generating package lists..."
     @just --justfile {{justfile()}} backup-packages
-    
-    @echo "Staging changes"
-    @{{git_cmd}} status -s | grep " M "
-    
+
     @echo "📥 Staging tracked files..."
+    @{{git_cmd}} status -s | grep " M "
     {{git_cmd}} add -u
     
     @echo "💾 Committing..."
