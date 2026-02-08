@@ -515,3 +515,8 @@ fortune | cowsay
 # =============================================================================
 # End of ~/.zshrc
 # =============================================================================
+
+# nix (added by EMS_Game installer)
+if [ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+fi
