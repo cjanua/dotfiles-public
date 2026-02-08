@@ -6,7 +6,7 @@ git_cmd := "/usr/bin/git --git-dir=" + env_var('HOME') + "/dusky/ --work-tree=" 
 # Your specific repo (Origin)
 my_repo := "git@github.com:cjanua/dotfiles-public.git"
 # Official Dusky repo (Upstream)
-dusky_repo := "https://github.com/duskylinux/dotfiles.git"
+dusky_repo := "https://github.com/dusklinux/dusky.git"
 
 set shell := ["bash", "-c"]
 
@@ -41,20 +41,26 @@ sync:
     {{git_cmd}} pull origin main
     @echo "✅ System synced with cloud."
 
-# Update from official Dusky repo safely
+# Update from official Dusky repo (automatically applies changes)
 upgrade:
-    @echo "🔗 Ensuring upstream remote exists..."
-    @{{git_cmd}} remote add upstream {{dusky_repo}} 2>/dev/null || true
+    @echo "🌐 Cloning latest Dusky to /tmp/dusky-latest..."
+    @rm -rf /tmp/dusky-latest
+    git clone --depth 1 https://github.com/dusklinux/dusky.git /tmp/dusky-latest
     
-    @echo "📡 Fetching updates from Dusky..."
-    {{git_cmd}} fetch upstream
+    @echo "📊 Generating pre-upgrade diff..."
+    @diff -ur --exclude='edit_here' --exclude='scripts' \
+        /tmp/dusky-latest/.config/hypr/source/ \
+        ~/.config/hypr/source/ \
+        > /tmp/dusky_upgrade_diff.txt || true
     
-    @echo "🛡️  Creating a safety snapshot branch (pre-upgrade)..."
-    {{git_cmd}} branch -f pre-upgrade-backup
+    @echo "🔄 Applying Dusky updates to source/ folder..."
+    cp -rf /tmp/dusky-latest/.config/hypr/source/* ~/.config/hypr/source/
     
-    @echo "🔀 Merging Dusky updates into Main..."
-    @echo "⚠️  NOTE: If conflicts occur, resolve them, then run 'sys save \"Resolved conflicts\"'"
-    {{git_cmd}} merge upstream/main
+    @echo "✅ Dusky configs updated!"
+    @echo "📄 Changes saved to: /tmp/dusky_upgrade_diff.txt"
+    @echo ""
+    @echo "⚠️  Your customizations in edit_here/ are safe and unchanged."
+    @echo "🔄 Run: just save \"Updated Dusky configs\" to commit changes"
 
 # Abort an upgrade if it breaks things (Hard Reset)
 abort-upgrade:
