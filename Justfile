@@ -25,7 +25,7 @@ save +message="Auto-save snapshot":
     @just --justfile {{justfile()}} backup-packages
 
     @echo "📥 Staging tracked files..."
-    @{{git_cmd}} status -s | grep " M "
+    @{{git_cmd}} status -s | grep " M " || true
     {{git_cmd}} add -u
     
     @echo "💾 Committing..."
