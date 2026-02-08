@@ -237,6 +237,7 @@ smartmontools
 snapshot
 socat
 sof-firmware
+songrec
 starship
 steam
 stylua
