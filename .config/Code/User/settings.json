@@ -47,9 +47,12 @@
     "jupyter.askForKernelRestart": false,
     "cSpell.userWords": [
         "Amdahl's",
+        "baselevel",
         "Bashforth",
+        "elif",
         "Januario",
         "justfile",
+        "onready",
         "parallelizable",
         "paru"
     ],
